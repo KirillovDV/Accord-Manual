@@ -1,0 +1,26 @@
+.DS_Store
+
+# Xcode user state and build output
+DerivedData/
+build/
+*.xcarchive
+*.xcresult
+*.ipa
+*.dSYM
+AccordManual.xcodeproj/xcuserdata/
+AccordManual.xcodeproj/project.xcworkspace/xcuserdata/
+
+# SwiftPM build products
+.build/
+Importer/.build/
+
+# Generated Honda ESM package. A small JSON demo is versioned so the project
+# builds and launches immediately; the full SQLite database and media are local.
+Resources/ManualBundle/*
+!Resources/ManualBundle/manual.json
+Resources/ManualBundle.next/
+Resources/ManualBundle.backup-*/
+
+# Local source dumps and unrelated working material
+accord-manual-full/
+iFORA_материалы/

@@ -1,0 +1,48 @@
+{
+  "sections": [
+    {
+      "id": "demo-manual",
+      "title": "Руководство",
+      "parentID": null,
+      "sortOrder": 0,
+      "breadcrumbPath": ["Руководство"],
+      "applicability": {
+        "years": [2003, 2004, 2005, 2006, 2007, 2008],
+        "bodyCodes": ["CL7", "CL9", "CM1", "CM2", "CN1", "CN2"],
+        "engineCodes": [],
+        "transmissions": []
+      }
+    }
+  ],
+  "articles": [
+    {
+      "id": "demo-welcome",
+      "esmKey": null,
+      "title": "Демонстрационный материал",
+      "breadcrumbs": ["Руководство"],
+      "sourcePath": "demo/welcome.html",
+      "blocks": [
+        {
+          "id": "demo-welcome-heading",
+          "kind": "heading",
+          "text": "Accord Manual"
+        },
+        {
+          "id": "demo-welcome-text",
+          "kind": "paragraph",
+          "text": "Проект собран с демонстрационным набором и работает полностью офлайн. Для добавления полного локального Honda ESM используйте импортёр из README."
+        }
+      ],
+      "plainText": "Accord Manual. Проект собран с демонстрационным набором и работает полностью офлайн.",
+      "links": [],
+      "images": [],
+      "applicability": {
+        "years": [2003, 2004, 2005, 2006, 2007, 2008],
+        "bodyCodes": ["CL7", "CL9", "CM1", "CM2", "CN1", "CN2"],
+        "engineCodes": [],
+        "transmissions": []
+      },
+      "relatedArticleIDs": []
+    }
+  ]
+}

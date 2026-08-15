@@ -1,0 +1,579 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A001 /* AccordManualApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101 /* AccordManualApp.swift */; };
+		A002 /* ManualModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A102 /* ManualModels.swift */; };
+		A003 /* ManualStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A103 /* ManualStore.swift */; };
+		A004 /* UserModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A104 /* UserModels.swift */; };
+		A005 /* ManualViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A105 /* ManualViews.swift */; };
+		A006 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A106 /* SearchView.swift */; };
+		A007 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A107 /* SavedView.swift */; };
+		A008 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A108 /* SettingsView.swift */; };
+		A009 /* ArticleComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A109 /* ArticleComponents.swift */; };
+		A010 /* ImageGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A110 /* ImageGallery.swift */; };
+		A011 /* ManualBundle in Resources */ = {isa = PBXBuildFile; fileRef = A111 /* ManualBundle */; };
+		A012 /* ManualStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A113 /* ManualStoreTests.swift */; };
+		A013 /* AccordManualUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A114 /* AccordManualUITests.swift */; };
+		A014 /* SQLiteManualDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A117 /* SQLiteManualDatabase.swift */; };
+		A015 /* ManualImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A118 /* ManualImageCache.swift */; };
+		A016 /* DiagramGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A119 /* DiagramGeometry.swift */; };
+		A017 /* ArticlePDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120 /* ArticlePDFExporter.swift */; };
+		A018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A121 /* Assets.xcassets */; };
+		A019 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A122 /* PrivacyPolicyView.swift */; };
+		A020 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A123 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A801 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A601 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A301;
+			remoteInfo = AccordManual;
+		};
+		A802 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A601 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A301;
+			remoteInfo = AccordManual;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A101 /* AccordManualApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccordManualApp.swift; sourceTree = "<group>"; };
+		A102 /* ManualModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualModels.swift; sourceTree = "<group>"; };
+		A103 /* ManualStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualStore.swift; sourceTree = "<group>"; };
+		A104 /* UserModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModels.swift; sourceTree = "<group>"; };
+		A105 /* ManualViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualViews.swift; sourceTree = "<group>"; };
+		A106 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		A107 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
+		A108 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A109 /* ArticleComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleComponents.swift; sourceTree = "<group>"; };
+		A110 /* ImageGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageGallery.swift; sourceTree = "<group>"; };
+		A111 /* ManualBundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ManualBundle; sourceTree = "<group>"; };
+		A112 /* Accord Manual.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = "Accord Manual.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A113 /* ManualStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualStoreTests.swift; sourceTree = "<group>"; };
+		A114 /* AccordManualUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccordManualUITests.swift; sourceTree = "<group>"; };
+		A115 /* AccordManualTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AccordManualTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A116 /* AccordManualUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AccordManualUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A117 /* SQLiteManualDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteManualDatabase.swift; sourceTree = "<group>"; };
+		A118 /* ManualImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImageCache.swift; sourceTree = "<group>"; };
+		A119 /* DiagramGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagramGeometry.swift; sourceTree = "<group>"; };
+		A120 /* ArticlePDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePDFExporter.swift; sourceTree = "<group>"; };
+		A121 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A122 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
+		A123 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = App/PrivacyInfo.xcprivacy; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A503 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A505 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A507 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A201 = {
+			isa = PBXGroup;
+			children = (
+				A202 /* App */,
+				A203 /* Data */,
+				A204 /* Features */,
+				A205 /* Shared */,
+				A206 /* Resources */,
+				A207 /* Products */,
+				A214 /* Tests */,
+				A115 /* AccordManualTests.xctest */,
+				A116 /* AccordManualUITests.xctest */,
+			);
+			sourceTree = "<group>";
+		};
+		A202 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A101 /* AccordManualApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A203 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				A208 /* ManualStore */,
+				A209 /* UserStore */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		A204 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				A210 /* Manual */,
+				A211 /* Search */,
+				A212 /* Saved */,
+				A213 /* Settings */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		A205 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A109 /* ArticleComponents.swift */,
+				A110 /* ImageGallery.swift */,
+				A118 /* ManualImageCache.swift */,
+				A119 /* DiagramGeometry.swift */,
+				A120 /* ArticlePDFExporter.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A206 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A121 /* Assets.xcassets */,
+				A123 /* PrivacyInfo.xcprivacy */,
+				A111 /* ManualBundle */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A207 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A112 /* Accord Manual.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A208 /* ManualStore */ = {
+			isa = PBXGroup;
+			children = (
+				A102 /* ManualModels.swift */,
+				A103 /* ManualStore.swift */,
+				A117 /* SQLiteManualDatabase.swift */,
+			);
+			path = ManualStore;
+			sourceTree = "<group>";
+		};
+		A209 /* UserStore */ = {
+			isa = PBXGroup;
+			children = (
+				A104 /* UserModels.swift */,
+			);
+			path = UserStore;
+			sourceTree = "<group>";
+		};
+		A210 /* Manual */ = {
+			isa = PBXGroup;
+			children = (
+				A105 /* ManualViews.swift */,
+			);
+			path = Manual;
+			sourceTree = "<group>";
+		};
+		A211 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				A106 /* SearchView.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
+		A212 /* Saved */ = {
+			isa = PBXGroup;
+			children = (
+				A107 /* SavedView.swift */,
+			);
+			path = Saved;
+			sourceTree = "<group>";
+		};
+		A213 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A108 /* SettingsView.swift */,
+				A122 /* PrivacyPolicyView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A214 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				A215 /* AccordManualTests */,
+				A216 /* AccordManualUITests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		A215 /* AccordManualTests */ = {
+			isa = PBXGroup;
+			children = (
+				A113 /* ManualStoreTests.swift */,
+			);
+			path = AccordManualTests;
+			sourceTree = "<group>";
+		};
+		A216 /* AccordManualUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A114 /* AccordManualUITests.swift */,
+			);
+			path = AccordManualUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A301 /* AccordManual */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A401 /* Build configuration list for PBXNativeTarget "AccordManual" */;
+			buildPhases = (
+				A501 /* Resources */,
+				A502 /* Sources */,
+				A503 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AccordManual;
+			productName = AccordManual;
+			productReference = A112 /* Accord Manual.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A302 /* AccordManualTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A403 /* Build configuration list for PBXNativeTarget "AccordManualTests" */;
+			buildPhases = (
+				A504 /* Sources */,
+				A505 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A901 /* PBXTargetDependency */,
+			);
+			name = AccordManualTests;
+			productName = AccordManualTests;
+			productReference = A115 /* AccordManualTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A303 /* AccordManualUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A404 /* Build configuration list for PBXNativeTarget "AccordManualUITests" */;
+			buildPhases = (
+				A506 /* Sources */,
+				A507 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A902 /* PBXTargetDependency */,
+			);
+			name = AccordManualUITests;
+			productName = AccordManualUITests;
+			productReference = A116 /* AccordManualUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A601 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A301 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					A302 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = A301;
+					};
+					A303 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = A301;
+					};
+				};
+			};
+			buildConfigurationList = A402 /* Build configuration list for PBXProject "AccordManual" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				ru,
+				Base,
+			);
+			mainGroup = A201;
+			productRefGroup = A207 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A301 /* AccordManual */,
+				A302 /* AccordManualTests */,
+				A303 /* AccordManualUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A501 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A018 /* Assets.xcassets in Resources */,
+				A020 /* PrivacyInfo.xcprivacy in Resources */,
+				A011 /* ManualBundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A502 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A001 /* AccordManualApp.swift in Sources */,
+				A002 /* ManualModels.swift in Sources */,
+				A003 /* ManualStore.swift in Sources */,
+				A004 /* UserModels.swift in Sources */,
+				A005 /* ManualViews.swift in Sources */,
+				A006 /* SearchView.swift in Sources */,
+				A007 /* SavedView.swift in Sources */,
+				A008 /* SettingsView.swift in Sources */,
+				A019 /* PrivacyPolicyView.swift in Sources */,
+				A009 /* ArticleComponents.swift in Sources */,
+				A010 /* ImageGallery.swift in Sources */,
+				A014 /* SQLiteManualDatabase.swift in Sources */,
+				A015 /* ManualImageCache.swift in Sources */,
+				A016 /* DiagramGeometry.swift in Sources */,
+				A017 /* ArticlePDFExporter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A504 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A012 /* ManualStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A506 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A013 /* AccordManualUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A901 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A301 /* AccordManual */;
+			targetProxy = A801 /* PBXContainerItemProxy */;
+		};
+		A902 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A301 /* AccordManual */;
+			targetProxy = A802 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A701 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		A702 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		A703 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 54E838Y792;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Accord Manual";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deniskirillov.accordmanual;
+				PRODUCT_MODULE_NAME = AccordManual;
+				PRODUCT_NAME = "Accord Manual";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A704 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 54E838Y792;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Accord Manual";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deniskirillov.accordmanual;
+				PRODUCT_MODULE_NAME = AccordManual;
+				PRODUCT_NAME = "Accord Manual";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A705 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.accordmanual.app.tests;
+				PRODUCT_NAME = AccordManualTests;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Accord Manual.app/Accord Manual";
+			};
+			name = Debug;
+		};
+		A706 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.accordmanual.app.tests;
+				PRODUCT_NAME = AccordManualTests;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Accord Manual.app/Accord Manual";
+			};
+			name = Release;
+		};
+		A707 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.accordmanual.app.uitests;
+				PRODUCT_NAME = AccordManualUITests;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = AccordManual;
+			};
+			name = Debug;
+		};
+		A708 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.accordmanual.app.uitests;
+				PRODUCT_NAME = AccordManualUITests;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = AccordManual;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A401 /* Build configuration list for PBXNativeTarget "AccordManual" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A703 /* Debug */,
+				A704 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A402 /* Build configuration list for PBXProject "AccordManual" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A701 /* Debug */,
+				A702 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A403 /* Build configuration list for PBXNativeTarget "AccordManualTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A705 /* Debug */,
+				A706 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A404 /* Build configuration list for PBXNativeTarget "AccordManualUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A707 /* Debug */,
+				A708 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A601 /* Project object */;
+}
