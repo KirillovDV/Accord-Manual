@@ -6,10 +6,28 @@ struct ManualArticle: Codable, Identifiable, Hashable, Sendable {
     let id: String; let esmKey: String?; let title: String; let breadcrumbs: [String]; let sourcePath: String; let blocks: [ArticleBlock]; let plainText: String; let links: [String]; let images: [ManualImage]; let applicability: Applicability; let relatedArticleIDs: [String]
     var sectionID: String { breadcrumbs.joined(separator: "/") }
 }
+
+/// Keeps a source-navigation leaf from appearing to be an endlessly loading article.
+enum ArticleLoadPresentation: Equatable {
+    case loading
+    case content
+    case unavailable
+
+    init(article: ManualArticle, isLoading: Bool) {
+        if isLoading {
+            self = .loading
+        } else if article.blocks.isEmpty {
+            self = .unavailable
+        } else {
+            self = .content
+        }
+    }
+}
+
 struct ArticleBlock: Codable, Hashable, Sendable, Identifiable {
-    let id: String; let kind: BlockKind; let text: String; let items: [String]; let rows: [[String]]; let tableRows: [[ManualTableCell]]; let target: String?; let anchor: String?; let steps: [ProcedureStep]
-    init(id: String = UUID().uuidString, kind: BlockKind, text: String = "", items: [String] = [], rows: [[String]] = [], tableRows: [[ManualTableCell]] = [], target: String? = nil, anchor: String? = nil, steps: [ProcedureStep] = []) { self.id = id; self.kind = kind; self.text = text; self.items = items; self.rows = rows; self.tableRows = tableRows; self.target = target; self.anchor = anchor; self.steps = steps }
-    private enum CodingKeys: String, CodingKey { case id, kind, text, items, rows, tableRows, target, anchor, steps }
+    let id: String; let kind: BlockKind; let text: String; let items: [String]; let rows: [[String]]; let tableRows: [[ManualTableCell]]; let target: String?; let anchor: String?; let steps: [ProcedureStep]; let inlineLinks: [ArticleInlineLink]
+    init(id: String = UUID().uuidString, kind: BlockKind, text: String = "", items: [String] = [], rows: [[String]] = [], tableRows: [[ManualTableCell]] = [], target: String? = nil, anchor: String? = nil, steps: [ProcedureStep] = [], inlineLinks: [ArticleInlineLink] = []) { self.id = id; self.kind = kind; self.text = text; self.items = items; self.rows = rows; self.tableRows = tableRows; self.target = target; self.anchor = anchor; self.steps = steps; self.inlineLinks = inlineLinks }
+    private enum CodingKeys: String, CodingKey { case id, kind, text, items, rows, tableRows, target, anchor, steps, inlineLinks }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
@@ -21,8 +39,29 @@ struct ArticleBlock: Codable, Hashable, Sendable, Identifiable {
         target = try container.decodeIfPresent(String.self, forKey: .target)
         anchor = try container.decodeIfPresent(String.self, forKey: .anchor)
         steps = try container.decodeIfPresent([ProcedureStep].self, forKey: .steps) ?? []
+        inlineLinks = try container.decodeIfPresent([ArticleInlineLink].self, forKey: .inlineLinks) ?? []
     }
     enum BlockKind: String, Codable, Sendable { case heading, paragraph, numberedSteps, bulletList, warning, note, table, image, link, anchor, specification }
+}
+struct ArticleInlineLink: Codable, Hashable, Sendable {
+    let text: String
+    let target: String
+}
+
+enum ArticleAnchorResolver {
+    /// Returns the ScrollView identity for a legacy HTML anchor. Procedure
+    /// anchors deliberately resolve to their owning step so every alias lands
+    /// at a stable, visible reader element.
+    static func scrollIdentifier(for anchor: String, in article: ManualArticle) -> String? {
+        for block in article.blocks {
+            if block.anchor == anchor || block.id == anchor { return block.id }
+            if block.kind == .numberedSteps,
+               let step = block.steps.first(where: { $0.id == anchor || $0.anchors.contains(anchor) }) {
+                return step.id
+            }
+        }
+        return nil
+    }
 }
 struct ProcedureStep: Codable, Hashable, Sendable, Identifiable {
     let id: String; let number: Int; let text: String; let substeps: [String]; let anchors: [String]; let supportingBlocks: [ArticleBlock]

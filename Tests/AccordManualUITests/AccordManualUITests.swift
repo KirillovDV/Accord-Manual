@@ -2,11 +2,90 @@ import XCTest
 
 @MainActor
 final class AccordManualUITests: XCTestCase {
+    private let seededArticleID = "e0f1d9553589ca92"
+    private let seededArticleTitle = "Конструкция кузова — лист 000000000001544"
+    private let sectionArticleID = "036cd34a7aafbb9e"
+    private let sectionArticleTitle = "Навигация исходного руководства — лист BRL_CM2_2008"
+    private let tableAndImageArticleID = "381eeb12f4e6141a"
+
+    func testRecentArticleOpensFromManualHome() {
+        let app = makeManualHomeApp()
+
+        let recentArticle = app.buttons["recent-article-\(seededArticleID)"]
+        XCTAssertTrue(recentArticle.waitForExistence(timeout: 10))
+        recentArticle.tap()
+
+        XCTAssertTrue(app.staticTexts[seededArticleTitle].waitForExistence(timeout: 10))
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Manual home recent article"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
+
+    func testSectionArticleOpensFromManualHome() {
+        let app = makeManualHomeApp()
+
+        app.swipeUp()
+        let rootSection = app.buttons["manual-section-Руководство"]
+        XCTAssertTrue(rootSection.waitForExistence(timeout: 10))
+        rootSection.tap()
+
+        let bodyRepair = app.buttons["manual-section-Руководство/Ремонт кузова"]
+        XCTAssertTrue(bodyRepair.waitForExistence(timeout: 10))
+        bodyRepair.tap()
+
+        let generalInformation = app.buttons["manual-section-Руководство/Ремонт кузова/Общая информация"]
+        XCTAssertTrue(generalInformation.waitForExistence(timeout: 10))
+        generalInformation.tap()
+
+        let article = app.buttons["section-article-\(sectionArticleID)"]
+        XCTAssertTrue(article.waitForExistence(timeout: 10))
+        article.tap()
+
+        XCTAssertTrue(app.staticTexts[sectionArticleTitle].waitForExistence(timeout: 10))
+    }
+
+    func testIPadManualHomeOpensSelectionInDetail() throws {
+        try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad)
+        let app = makeManualHomeApp()
+
+        let sidebarRootSection = app.buttons["manual-section-Руководство"]
+        XCTAssertTrue(sidebarRootSection.waitForExistence(timeout: 10))
+        app.buttons["recent-article-\(seededArticleID)"].tap()
+
+        XCTAssertTrue(app.staticTexts[seededArticleTitle].waitForExistence(timeout: 10))
+        XCTAssertTrue(sidebarRootSection.exists)
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "iPad manual sidebar and article portrait"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
+
+    func testIPadArticleContentIsReadableAndDoesNotOverflow() throws {
+        try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad)
+        let app = makeManualHomeApp(historyArticleID: tableAndImageArticleID)
+        app.buttons["recent-article-\(tableAndImageArticleID)"].tap()
+
+        let content = app.otherElements["article-content"]
+        XCTAssertTrue(content.waitForExistence(timeout: 10))
+        XCTAssertLessThanOrEqual(content.frame.width, 900)
+        XCTAssertLessThanOrEqual(content.frame.maxX, app.frame.maxX + 1)
+        XCTAssertGreaterThanOrEqual(content.frame.minX, app.frame.minX - 1)
+
+        XCUIDevice.shared.orientation = .landscapeLeft
+        defer { XCUIDevice.shared.orientation = .portrait }
+        XCTAssertTrue(content.waitForExistence(timeout: 10))
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "iPad article landscape"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
+
     func testFeedbackShowsConfiguredContactMethods() {
         let app = XCUIApplication()
         app.launch()
 
-        let moreTab = app.tabBars.buttons["Ещё"]
+        let moreTab = app.buttons["Ещё"].firstMatch
         XCTAssertTrue(moreTab.waitForExistence(timeout: 10))
         moreTab.tap()
         app.swipeUp()
@@ -22,10 +101,15 @@ final class AccordManualUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchEnvironment["ACCORD_UI_TEST_RESET_NAVIGATION"] = "1"
         app.launch()
-        let searchTab = app.tabBars.buttons["Поиск"]
+        let searchTab = app.buttons["Поиск"].firstMatch
         XCTAssertTrue(searchTab.waitForExistence(timeout: 15))
         searchTab.tap()
         let field = app.searchFields["DTC, момент, деталь или тема"]
+        if !field.waitForExistence(timeout: 2) {
+            let revealSearch = app.buttons["Search"].firstMatch
+            XCTAssertTrue(revealSearch.waitForExistence(timeout: 10))
+            revealSearch.tap()
+        }
         XCTAssertTrue(field.waitForExistence(timeout: 10))
         field.tap(); field.typeText("P0300")
         let firstResult = app.cells.firstMatch
@@ -104,6 +188,12 @@ final class AccordManualUITests: XCTestCase {
 
         let openArticle = app.buttons["Открыть статью"]
         XCTAssertTrue(openArticle.waitForExistence(timeout: 10))
+
+        let linkScreenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        linkScreenshot.name = "Interactive diagram link"
+        linkScreenshot.lifetime = .keepAlways
+        add(linkScreenshot)
+
         openArticle.tap()
         XCTAssertTrue(app.staticTexts[destinationTitle].waitForExistence(timeout: 10))
     }
@@ -118,5 +208,13 @@ final class AccordManualUITests: XCTestCase {
         XCTAssertTrue(export.isHittable)
         export.tap()
         XCTAssertTrue(app.otherElements["ActivityListView"].waitForExistence(timeout: 10) || app.buttons["Сохранить в Файлы"].waitForExistence(timeout: 10))
+    }
+
+    private func makeManualHomeApp(historyArticleID: String? = nil) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchEnvironment["ACCORD_UI_TEST_RESET_NAVIGATION"] = "1"
+        app.launchEnvironment["ACCORD_UI_TEST_SEED_HISTORY_ARTICLE"] = historyArticleID ?? seededArticleID
+        app.launch()
+        return app
     }
 }

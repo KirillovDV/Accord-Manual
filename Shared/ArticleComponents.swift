@@ -146,7 +146,8 @@ enum ProcedureStepContentLayout {
             tableRows: block.tableRows,
             target: block.target,
             anchor: block.anchor,
-            steps: block.steps
+            steps: block.steps,
+            inlineLinks: block.inlineLinks
         )
     }
 }
@@ -158,44 +159,50 @@ struct ArticleBlockView: View {
     let article: ManualArticle
     let findText: String
     let openImage: (String) -> Void
+    var openLink: ((String) -> Void)? = nil
+    var highlightedAnchor: String? = nil
 
     var body: some View {
-        Group {
-            switch block.kind {
-            case .heading:
-                HighlightedText(text: block.text, query: findText).font(.title2.bold())
-            case .paragraph, .specification:
-                HighlightedText(text: block.text, query: findText).font(.body)
-            case .numberedSteps:
-                ProcedureChecklist(block: block, article: article, findText: findText, openImage: openImage)
-            case .bulletList:
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(Array(block.items.enumerated()), id: \.offset) { _, item in
-                        Label(item, systemImage: "circle.fill").labelStyle(BulletLabelStyle())
-                    }
+        content
+            .id(block.anchor ?? block.id)
+            .background(isHighlighted ? Color.accentColor.opacity(0.16) : .clear, in: RoundedRectangle(cornerRadius: 8))
+            .animation(UIAccessibility.isReduceMotionEnabled ? nil : .easeInOut(duration: 0.2), value: isHighlighted)
+            .accessibilityElement(children: .contain)
+    }
+
+    @ViewBuilder private var content: some View {
+        switch block.kind {
+        case .heading:
+            HighlightedText(text: block.text, query: findText).font(.title2.bold())
+        case .paragraph, .specification:
+            InlineLinkedText(text: block.text, links: block.inlineLinks, query: findText, openLink: navigate).font(.body)
+        case .numberedSteps:
+            ProcedureChecklist(block: block, article: article, findText: findText, openImage: openImage, openLink: openLink, highlightedAnchor: highlightedAnchor)
+        case .bulletList:
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(block.items.enumerated()), id: \.offset) { _, item in
+                    Label(item, systemImage: "circle.fill").labelStyle(BulletLabelStyle())
                 }
-            case .warning:
-                Callout(title: warningTitle(block.text), text: block.text, symbol: "exclamationmark.triangle.fill")
-            case .note:
-                NoteCalloutView(note: ArticleNoteGroup(block: block, supportingBlocks: []), article: article, findText: findText, openImage: openImage)
-            case .table:
-                SpecificationTable(rows: block.tableRows)
-            case .image:
-                ManualImageThumbnail(
-                    metadata: article.images.first { $0.localRelativePath == block.target },
-                    path: block.target,
-                    label: imageLabel,
-                    openImage: { if let target = block.target { openImage(target) } }
-                )
-                .accessibilityHint("Открывает изображение на весь экран")
-            case .link:
-                linkView
-            case .anchor:
-                Color.clear.frame(height: 1)
             }
+        case .warning:
+            Callout(title: warningTitle(block.text), text: block.text, symbol: "exclamationmark.triangle.fill")
+        case .note:
+            NoteCalloutView(note: ArticleNoteGroup(block: block, supportingBlocks: []), article: article, findText: findText, openImage: openImage, openLink: openLink, highlightedAnchor: highlightedAnchor)
+        case .table:
+            SpecificationTable(rows: block.tableRows)
+        case .image:
+            ManualImageThumbnail(
+                metadata: article.images.first { $0.localRelativePath == block.target },
+                path: block.target,
+                label: imageLabel,
+                openImage: { if let target = block.target { openImage(target) } }
+            )
+            .accessibilityHint("Открывает изображение на весь экран")
+        case .link:
+            linkView
+        case .anchor:
+            Color.clear.frame(height: 1)
         }
-        .id(block.anchor ?? block.id)
-        .accessibilityElement(children: .contain)
     }
 
     private var imageLabel: String {
@@ -205,12 +212,25 @@ struct ArticleBlockView: View {
     }
 
     @ViewBuilder private var linkView: some View {
-        if let target = block.target, let destination = destination(for: target) {
-            Button { router.open(articleID: destination.article.id, anchor: destination.anchor) } label: {
+        if let target = block.target, destination(for: target) != nil {
+            Button { navigate(target) } label: {
                 Label(block.text, systemImage: "link")
             }
         } else {
             Label(block.text, systemImage: "link.badge.plus").foregroundStyle(.secondary)
+        }
+    }
+
+    private var isHighlighted: Bool {
+        guard let highlightedAnchor else { return false }
+        return block.anchor == highlightedAnchor || block.id == highlightedAnchor
+    }
+
+    private func navigate(_ target: String) {
+        if let openLink {
+            openLink(target)
+        } else if let destination = destination(for: target) {
+            router.open(articleID: destination.article.id, anchor: destination.anchor)
         }
     }
 
@@ -236,6 +256,8 @@ struct NoteCalloutView: View {
     let article: ManualArticle
     let findText: String
     let openImage: (String) -> Void
+    var openLink: ((String) -> Void)? = nil
+    var highlightedAnchor: String? = nil
     @State private var isExpanded = true
 
     var body: some View {
@@ -267,7 +289,7 @@ struct NoteCalloutView: View {
                     HighlightedText(text: noteText, query: findText).font(.body)
                 }
                 ForEach(note.supportingBlocks) { block in
-                    ArticleBlockView(block: block, article: article, findText: findText, openImage: openImage)
+                    ArticleBlockView(block: block, article: article, findText: findText, openImage: openImage, openLink: openLink, highlightedAnchor: highlightedAnchor)
                 }
             }
         }
@@ -390,6 +412,55 @@ struct HighlightedText: View {
     }
 }
 
+private struct InlineLinkedText: View {
+    let text: String
+    let links: [ArticleInlineLink]
+    let query: String
+    let openLink: (String) -> Void
+
+    var body: some View {
+        Text(attributed)
+            .environment(\.openURL, OpenURLAction { url in
+                guard url.scheme == "accordmanual",
+                      let target = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "target" })?.value else {
+                    return .systemAction
+                }
+                openLink(target)
+                return .handled
+            })
+    }
+
+    private var attributed: AttributedString {
+        var result = AttributedString(text)
+        var searchStart = text.startIndex
+        for link in links {
+            guard !link.text.isEmpty,
+                  let range = text.range(of: link.text, options: [.caseInsensitive, .diacriticInsensitive], range: searchStart..<text.endIndex),
+                  let attributedRange = Range(range, in: result),
+                  let url = linkURL(target: link.target) else { continue }
+            result[attributedRange].link = url
+            result[attributedRange].underlineStyle = .single
+            searchStart = range.upperBound
+        }
+        var queryStart = text.startIndex
+        while !query.isEmpty,
+              let range = text.range(of: query, options: [.caseInsensitive, .diacriticInsensitive], range: queryStart..<text.endIndex),
+              let attributedRange = Range(range, in: result) {
+            result[attributedRange].backgroundColor = .yellow.opacity(0.55)
+            queryStart = range.upperBound
+        }
+        return result
+    }
+
+    private func linkURL(target: String) -> URL? {
+        var components = URLComponents()
+        components.scheme = "accordmanual"
+        components.host = "article-link"
+        components.queryItems = [URLQueryItem(name: "target", value: target)]
+        return components.url
+    }
+}
+
 struct ProcedureChecklist: View {
     @Environment(\.modelContext) private var context
     @Query private var states: [ChecklistState]
@@ -397,11 +468,13 @@ struct ProcedureChecklist: View {
     let article: ManualArticle
     let findText: String
     let openImage: (String) -> Void
+    let openLink: ((String) -> Void)?
+    let highlightedAnchor: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Порядок выполнения").font(.headline)
-            ForEach(steps) { step in
+            ForEach(Array(steps), id: \ProcedureStep.id) { step in
                 let content = ProcedureStepContentLayout.content(for: step)
                 VStack(alignment: .leading, spacing: 10) {
                     Toggle(isOn: binding(step)) {
@@ -414,13 +487,15 @@ struct ProcedureChecklist: View {
                             block: supporting,
                             article: article,
                             findText: findText,
-                            openImage: openImage
+                            openImage: openImage,
+                            openLink: openLink,
+                            highlightedAnchor: highlightedAnchor
                         )
                         .padding(.leading, 32)
                     }
 
                     if let note = content.note {
-                        NoteCalloutView(note: note, article: article, findText: findText, openImage: openImage)
+                        NoteCalloutView(note: note, article: article, findText: findText, openImage: openImage, openLink: openLink, highlightedAnchor: highlightedAnchor)
                             .padding(.leading, 32)
                     }
 
@@ -433,7 +508,11 @@ struct ProcedureChecklist: View {
                         .padding(.leading, 32)
                     }
                 }
-                .id(step.anchors.last ?? step.id)
+                .background(step.anchors.contains(highlightedAnchor ?? "") ? Color.accentColor.opacity(0.16) : .clear, in: RoundedRectangle(cornerRadius: 8))
+                .id(step.id)
+                ForEach(step.anchors, id: \.self) { anchor in
+                    Color.clear.frame(height: 0).id(anchor).accessibilityHidden(true)
+                }
             }
         }
         .padding()

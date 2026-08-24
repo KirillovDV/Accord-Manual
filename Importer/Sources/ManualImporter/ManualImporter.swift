@@ -23,6 +23,19 @@ public struct ImportedTableCell: Codable, Equatable, Sendable {
     }
 }
 
+/// A text link retained inside a paragraph. Legacy ESM decision trees commonly
+/// put a link in the middle of a sentence, where representing it as a separate
+/// block would change both its reading order and meaning.
+public struct ImportedInlineLink: Codable, Equatable, Sendable {
+    public var text: String
+    public var target: String
+
+    public init(text: String, target: String) {
+        self.text = text
+        self.target = target
+    }
+}
+
 public struct ImportedImageAnnotationLink: Codable, Equatable, Sendable {
     public var text: String
     public var target: String
@@ -81,9 +94,10 @@ public struct ImportedBlock: Codable, Equatable, Sendable {
     public var target: String?
     public var anchor: String?
     public var steps: [ImportedProcedureStep]
+    public var inlineLinks: [ImportedInlineLink]
 
-    public init(id: String = "", kind: ArticleBlockKind, text: String = "", items: [String] = [], rows: [[String]] = [], tableRows: [[ImportedTableCell]] = [], target: String? = nil, anchor: String? = nil, steps: [ImportedProcedureStep] = []) {
-        self.id = id; self.kind = kind; self.text = text; self.items = items; self.rows = rows; self.tableRows = tableRows; self.target = target; self.anchor = anchor; self.steps = steps
+    public init(id: String = "", kind: ArticleBlockKind, text: String = "", items: [String] = [], rows: [[String]] = [], tableRows: [[ImportedTableCell]] = [], target: String? = nil, anchor: String? = nil, steps: [ImportedProcedureStep] = [], inlineLinks: [ImportedInlineLink] = []) {
+        self.id = id; self.kind = kind; self.text = text; self.items = items; self.rows = rows; self.tableRows = tableRows; self.target = target; self.anchor = anchor; self.steps = steps; self.inlineLinks = inlineLinks
     }
 }
 
@@ -168,7 +182,7 @@ public enum LinkNormalizer {
         let trimmed = link.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, !trimmed.lowercased().hasPrefix("mailto:") else { return nil }
 
-        if let legacyTarget = legacyTarget(in: trimmed) { return legacyTarget }
+        if let legacyTarget = legacyTarget(in: trimmed, from: sourcePath) { return legacyTarget }
         guard !trimmed.lowercased().hasPrefix("javascript:") else { return nil }
 
         let pieces = trimmed.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false)
@@ -193,17 +207,24 @@ public enum LinkNormalizer {
         return target.split(separator: "#", maxSplits: 1).first.map(String.init)
     }
 
-    private static func legacyTarget(in link: String) -> String? {
+    private static func legacyTarget(in link: String, from sourcePath: String) -> String? {
         // CtsProc opens an ordinary ESM HTML page; PrtProc opens the matching zoom page.
         let cts = #"(?i)(?:CtsProc|PrtProc)\s*\(\s*['\"][^'\"]+['\"]\s*,\s*['\"]([^'\"]+)['\"](?:\s*,\s*['\"]([^'\"]+)['\"])?"#
         if let values = captures(cts, in: link), let key = values.first, !key.isEmpty {
             let anchor = values.dropFirst().first ?? ""
             return "ru/html/\(key).html" + (anchor.isEmpty ? "" : "#\(anchor)")
         }
+        // The regular article viewer uses parent.Jmp('i040') for an in-page
+        // diagnostic step. Unlike CtsProc it carries no page key.
+        let inPageJump = #"(?i)(?:parent\s*\.\s*)?Jmp\s*\(\s*['\"]([^'\"]+)['\"]"#
+        if let anchor = captures(inPageJump, in: link)?.first,
+           !anchor.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return sourcePath + "#" + anchor
+        }
         // A zoom page's in-page links are represented by JumpFunc('page.html#anchor').
         let jump = #"(?i)JumpFunc\s*\(\s*['\"]([^'\"]+)['\"]"#
         if let value = captures(jump, in: link)?.first, !value.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix(".html") {
-            return target(value, from: "ru/html/placeholder.html")
+            return target(value, from: sourcePath)
         }
         return nil
     }
@@ -276,21 +297,25 @@ public enum HTMLArticleParser {
         var active: ImportedBlock?
         var pendingAnchors: [String] = []
 
-        func flush() {
+        func flushActive() {
             guard let current = active else { return }
             result.append(current)
             active = nil
+        }
+        func flushPendingAnchors() {
+            result.append(contentsOf: pendingAnchors.map { ImportedBlock(kind: .anchor, text: $0, anchor: $0) })
             pendingAnchors = []
+        }
+        func flush() {
+            flushActive()
+            flushPendingAnchors()
         }
 
         for block in source {
             switch block.kind {
             case .anchor:
-                if active != nil, let anchor = block.anchor {
+                if let anchor = block.anchor {
                     pendingAnchors.append(anchor)
-                } else {
-                    flush()
-                    result.append(block)
                 }
             case .numberedSteps:
                 let incoming = block.steps.isEmpty ? fallbackSteps(from: block) : block.steps
@@ -305,14 +330,15 @@ public enum HTMLArticleParser {
                     active = current
                     pendingAnchors = []
                 } else {
-                    flush()
+                    let anchors = pendingAnchors
+                    pendingAnchors = []
+                    flushActive()
                     var first = block
                     var steps = incoming
-                    if !pendingAnchors.isEmpty { steps[0].anchors.append(contentsOf: pendingAnchors) }
+                    if !anchors.isEmpty { steps[0].anchors.append(contentsOf: anchors) }
                     first.steps = steps
                     first.items = steps.map(\.text)
                     active = first
-                    pendingAnchors = []
                 }
             case .image where block.id == layoutCompanionImageMarker:
                 // Honda's legacy viewer puts illustrations in a `graphTd` next
@@ -617,6 +643,14 @@ private struct OrderedHTMLTokenizer {
                     at: frame.blockInsertionIndex,
                     decorateForTableCell: false
                 )
+            } else if let marker = frame.cellContentMarker,
+                      let decisionBlocks = decisionBlocks(from: frame.tableRows, cellBlocks: blocks.filter({ $0.id == marker })) {
+                // `Viewer` tables with the first two narrow cells "ДА -" or
+                // "НЕТ -" are decision branches, not tabular data. The old
+                // renderer flattened only their final cell. Rebuild each row
+                // as a paragraph and retain links embedded in its sentence.
+                blocks.removeAll { $0.id == marker }
+                blocks.insert(contentsOf: decisionBlocks, at: min(frame.blockInsertionIndex, blocks.count))
             }
         case "a":
             if let href = attribute("href", in: frame.attributes), let target = LinkNormalizer.target(href, from: sourcePath) {
@@ -649,6 +683,26 @@ private struct OrderedHTMLTokenizer {
         }
         if !stack.isEmpty { stack[stack.count - 1].text += " " + value }
         if !stack.contains(where: { ["head", "title"].contains($0.name) }) { plainText += " " + value }
+    }
+
+    private func decisionBlocks(from rows: [[ImportedTableCell]], cellBlocks: [ImportedBlock]) -> [ImportedBlock]? {
+        guard !rows.isEmpty else { return nil }
+        let decisionLabels = Set(["да", "нет", "yes", "no"])
+        let links = cellBlocks.compactMap { block -> ImportedInlineLink? in
+            guard block.kind == .link, let target = block.target, !block.text.isEmpty else { return nil }
+            return .init(text: block.text, target: target)
+        }
+        var result: [ImportedBlock] = []
+        for row in rows {
+            guard row.count >= 3 else { return nil }
+            let label = normalizedWhitespace(row[0].text)
+            let separator = normalizedWhitespace(row[1].text)
+            let body = normalizedWhitespace(row.dropFirst(2).map(\.text).joined(separator: " "))
+            guard decisionLabels.contains(label.lowercased()), ["-", "—", "–"].contains(separator), !body.isEmpty else { return nil }
+            let inlineLinks = links.filter { body.localizedCaseInsensitiveContains($0.text) }
+            result.append(.init(kind: .paragraph, text: "\(label) — \(body)", inlineLinks: inlineLinks))
+        }
+        return result
     }
 
     private mutating func addDiagramLineBreak() {

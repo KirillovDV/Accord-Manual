@@ -4,6 +4,37 @@ import SQLite3
 @testable import ManualImporter
 
 final class ManualImporterTests: XCTestCase {
+    func testPreservesDecisionLabelsAndInArticleJmpLink() throws {
+        let html = """
+        <p>Код DTC B1000 высветился на экране?</p>
+        <table class="Viewer" frame="void" style="margin-left:50px;">
+          <tr><td width="30" class="ViewerTD"><b>ДА</b></td><td width="10" class="ViewerTD" align="center">-</td><td class="ViewerTD"><div>Перейдите к <a href="javascript:parent.Jmp('i040')">Этап 4</a>.</div></td></tr>
+          <tr><td width="30" class="ViewerTD"><b>НЕТ</b></td><td width="10" class="ViewerTD" align="center">-</td><td class="ViewerTD"><div>Пропадающая неисправность.</div></td></tr>
+        </table>
+        <a name="i040"></a><ol><li value="4">Проверьте цепь.</li></ol>
+        """
+
+        XCTAssertEqual(
+            LinkNormalizer.target("javascript:parent.Jmp('i040')", from: "ru/html/b1000.html"),
+            "ru/html/b1000.html#i040"
+        )
+
+        let article = try HTMLArticleParser.parse(
+            html: html,
+            id: "b1000",
+            title: "Коды поиска неисправностей (DTC): B1000",
+            breadcrumbs: [],
+            sourcePath: "ru/html/b1000.html"
+        )
+
+        XCTAssertTrue(article.blocks.contains { $0.text.contains("ДА") && $0.text.contains("Перейдите к") })
+        XCTAssertTrue(article.blocks.contains { $0.text.contains("НЕТ") && $0.text.contains("Пропадающая неисправность") })
+        let inlineLink = try XCTUnwrap(article.blocks.first { $0.text.contains("ДА") }?.inlineLinks.first)
+        XCTAssertEqual(inlineLink.text, "Этап 4")
+        XCTAssertEqual(inlineLink.target, "ru/html/b1000.html#i040")
+        XCTAssertEqual(article.blocks.first { $0.kind == .numberedSteps }?.steps.first?.anchors, ["i040"])
+    }
+
     func testKeepsZoomVariantForOriginalLinkButExcludesItFromCatalogueAndSearch() throws {
         let root = try makeMinimalRoot()
         let output = root.appendingPathComponent("output")

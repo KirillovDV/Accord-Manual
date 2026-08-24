@@ -116,6 +116,17 @@ struct ArticleReaderState: Equatable {
         persist()
     }
 
+    /// Starts a new root route while keeping the detail NavigationStack empty.
+    /// A sidebar selection is not part of that stack, so its previous forward
+    /// history must not be offered for the newly selected root material.
+    func replacePath(_ newPath: [ManualRoute]) {
+        isUpdatingPath = true
+        path = Array(newPath.suffix(100))
+        forwardPath.removeAll()
+        isUpdatingPath = false
+        persist()
+    }
+
     private func persist() {
         guard let storageKey, let data = try? JSONEncoder().encode(PersistedState(path: path, forwardPath: forwardPath)) else { return }
         UserDefaults.standard.set(data, forKey: storageKey)

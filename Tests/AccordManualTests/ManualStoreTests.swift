@@ -4,11 +4,52 @@ import UIKit
 
 @MainActor
 final class ManualStoreTests: XCTestCase {
+    func testLoadedNavigationLeafWithoutBlocksIsUnavailableInsteadOfLoading() {
+        let article = ManualArticle(
+            id: "navigation-leaf",
+            esmKey: nil,
+            title: "Навигационный лист",
+            breadcrumbs: ["Руководство"],
+            sourcePath: "ru/html/navigation.html",
+            blocks: [],
+            plainText: "",
+            links: [],
+            images: [],
+            applicability: Applicability(years: [], bodyCodes: [], engineCodes: [], transmissions: []),
+            relatedArticleIDs: []
+        )
+
+        XCTAssertEqual(ArticleLoadPresentation(article: article, isLoading: false), .unavailable)
+    }
+
     func testPrivacyPolicyStatesThatDataStaysOnDeviceAndTrackingIsDisabled() {
         XCTAssertEqual(PrivacyPolicy.appPrivacySummary, "Данные не собираются")
         XCTAssertFalse(PrivacyPolicy.tracksUsers)
         XCTAssertTrue(PrivacyPolicy.inAppText.contains("на устройстве"))
         XCTAssertTrue(PrivacyPolicy.inAppText.contains(AppConfiguration.supportEmail))
+    }
+
+    func testAnchorResolverTargetsProcedureStepForLegacyAnchor() {
+        let procedure = ArticleBlock(
+            id: "procedure",
+            kind: .numberedSteps,
+            steps: [ProcedureStep(id: "step-4", number: 4, text: "Проверьте цепь.", anchors: ["i040"])]
+        )
+        let article = ManualArticle(
+            id: "b1000",
+            esmKey: nil,
+            title: "DTC B1000",
+            breadcrumbs: [],
+            sourcePath: "ru/html/b1000.html",
+            blocks: [procedure],
+            plainText: "",
+            links: [],
+            images: [],
+            applicability: Applicability(years: [], bodyCodes: [], engineCodes: [], transmissions: []),
+            relatedArticleIDs: []
+        )
+
+        XCTAssertEqual(ArticleAnchorResolver.scrollIdentifier(for: "i040", in: article), "step-4")
     }
 
     func testArticleContentLayoutGroupsStandaloneNoteAndItsSupportingBlocks() {
@@ -220,6 +261,19 @@ final class ManualStoreTests: XCTestCase {
         store.open(articleID: "A", anchor: "i020")
         XCTAssertEqual(store.path.count, 1)
         XCTAssertEqual(store.currentRoute?.anchor, "i020")
+    }
+
+    @MainActor
+    func testReplacingDetailPathClearsForwardHistory() {
+        let router = NavigationRouter()
+        router.open(articleID: "A")
+        router.open(articleID: "B")
+        _ = router.goBack()
+
+        router.replacePath([])
+
+        XCTAssertTrue(router.path.isEmpty)
+        XCTAssertFalse(router.canGoForward)
     }
 
     @MainActor
